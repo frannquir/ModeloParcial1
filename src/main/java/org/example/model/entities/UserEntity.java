@@ -8,14 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class User {
+@Builder
+public class UserEntity {
     private Integer id;
     private String name;
     private String email;
 
-    @Builder
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
 }
