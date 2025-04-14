@@ -5,10 +5,7 @@ import org.example.model.entities.BookEntity;
 import org.example.model.entities.LoanEntity;
 import org.example.repositories.interfaces.IRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +23,7 @@ public class LoanRepository implements IRepository<LoanEntity> {
         if(dateString != null)
             date = LocalDate.parse(dateString);
         return Optional.of(LoanEntity.builder()
+                .id(rs.getInt("id"))
                 .bookId(rs.getInt("libro_id"))
                 .userId(rs.getInt("usuario_id"))
                 .dateLoan(LocalDate.parse(rs.getString("fecha_prestamo")))
@@ -44,8 +42,8 @@ public class LoanRepository implements IRepository<LoanEntity> {
                 Optional<LoanEntity> loanOpt = resultToLoan(rs);
                 loanOpt.ifPresent(loans::add);
             }
+            return loans;
         }
-        return List.of();
     }
 
     @Override
@@ -94,6 +92,15 @@ public class LoanRepository implements IRepository<LoanEntity> {
         try (Connection c = DatabaseConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+    public void update (LoanEntity entity) throws SQLException {
+        String sql = "UPDATE prestamos SET fecha_devolucion = ? WHERE id = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setDate(1, Date.valueOf(entity.getDatePaid()));
+            ps.setInt(2, entity.getId());
             ps.executeUpdate();
         }
     }

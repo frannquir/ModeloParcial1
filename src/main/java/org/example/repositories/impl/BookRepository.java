@@ -16,12 +16,15 @@ import java.util.Optional;
 
 public class BookRepository implements IRepository<BookEntity> {
     private static BookRepository instance;
-    public static BookRepository getInstance () {
-        if(instance == null) instance = new BookRepository();
+
+    public static BookRepository getInstance() {
+        if (instance == null) instance = new BookRepository();
         return instance;
     }
+
     private Optional<BookEntity> resultToBook(ResultSet rs) throws SQLException {
         return Optional.of(BookEntity.builder()
+                .id(rs.getInt("id"))
                 .title(rs.getString("titulo"))
                 .author(rs.getString("autor"))
                 .year(rs.getInt("anio_publicacion"))
@@ -33,15 +36,15 @@ public class BookRepository implements IRepository<BookEntity> {
     public List<BookEntity> findAll() throws SQLException {
         String sql = "SELECT * FROM libros";
         try (Connection c = DatabaseConnection.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             List<BookEntity> books = new ArrayList<>();
-            while(rs.next()) {
+            while (rs.next()) {
                 Optional<BookEntity> bookOpt = resultToBook(rs);
                 bookOpt.ifPresent(books::add);
             }
+            return books;
         }
-        return List.of();
     }
 
     @Override
@@ -62,9 +65,9 @@ public class BookRepository implements IRepository<BookEntity> {
     public Integer count() throws SQLException {
         String sql = "SELECT COUNT(*) FROM libros";
         try (Connection c = DatabaseConnection.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery()) {
-            if(rs.next()) {
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
                 return rs.getInt(1);
             }
         }
@@ -76,7 +79,7 @@ public class BookRepository implements IRepository<BookEntity> {
         String sql = "INSERT INTO libros (titulo, autor, anio_publicacion, unidades_disponibles)" +
                 "VALUES (?, ?, ?, ?)";
         try (Connection c = DatabaseConnection.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql)) {
+             PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, book.getTitle());
             ps.setString(2, book.getAuthor());
             ps.setInt(3, book.getYear());

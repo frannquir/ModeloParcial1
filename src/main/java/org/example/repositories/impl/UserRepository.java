@@ -22,6 +22,7 @@ public class UserRepository implements IRepository<UserEntity> {
     }
     private Optional<UserEntity> resultToUser(ResultSet rs) throws SQLException {
         return Optional.of(UserEntity.builder()
+                .id(rs.getInt("id"))
                 .name(rs.getString("nombre"))
                 .email(rs.getString("email"))
                 .build());
@@ -38,8 +39,8 @@ public class UserRepository implements IRepository<UserEntity> {
                 Optional<UserEntity> userOpt = resultToUser(rs);
                 userOpt.ifPresent(users::add);
             }
+            return users;
         }
-        return List.of();
     }
 
     @Override
